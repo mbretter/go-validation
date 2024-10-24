@@ -6,7 +6,7 @@
 
 # validating and sanitizing structs and variables
 
-This is basically a wrapper around go-playerground/validator and go-playground/mold.
+This is basically a wrapper around [go-playground/validator](go-playground/validator) and [go-playground/mold](go-playground/mold).
 
 Besides the functionality of the go-playground packages it supports a more flexible error translation by using struct tags for error messages.
 
