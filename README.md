@@ -2,7 +2,7 @@
 [![](https://goreportcard.com/badge/mbretter/go-validation)](https://goreportcard.com/report/mbretter/go-validation "Go Report Card")
 [![codecov](https://codecov.io/gh/mbretter/go-validation/graph/badge.svg?token=YMBMKY7W9X)](https://codecov.io/gh/mbretter/go-validation)
 
-## validating and sanitizing structs and variables
+## Validating and sanitizing structs and variables
 
 This is basically a wrapper around [go-playground/validator](https://github.com/go-playground/validator) and [go-playground/mold](https://github.com/go-playground/mold).
 
@@ -11,7 +11,7 @@ Besides the functionality of the go-playground packages it supports a more flexi
 The error message is set into the `errors` tag of the struct field, the key is the validator as provided in the `validate` 
 struct tag. Multiple validators/errors are supported.
 
-## validating structs
+## Validating structs
 
 ```go
 type Address struct {
@@ -42,7 +42,7 @@ address.street -> global.street.required
 ```
 Nested fields are represented using a dot notation.
 
-## translation
+## Translation
 
 In many cases the translation is application specific, it does not make sense integrating a sofisticated translation 
 system into this package. However, it is possible to make the error translations by passing your own translation function.
@@ -55,14 +55,14 @@ If no translation func was given, the text as specified in the errors tag is ret
 ```go
 
 func Tr(key string, args ...any) string {
-	// in the real world, do something useful
+    // in the real world, do something useful
     return "tr." + key
 }
 
 fieldErrors, err := NewValidator().Struct(loginData, Tr)
 ```
 
-## slices of structs
+## Slices of structs
 
 The package supports slices or array of structs.
 
@@ -72,9 +72,9 @@ type Address struct {
 }
 
 type Customer struct {
-    Firstname string  `json:"firstname" validate:"required" errors:"required:global.firstname.required"`
-    Lastname string  `json:"lastname" validate:"required" errors:"required:global.lastname.required"`
-    Addresses  []Address `json:"addresses" validate:"dive"` // the dive keyword is important
+    Firstname string    `json:"firstname" validate:"required" errors:"required:global.firstname.required"`
+    Lastname  string    `json:"lastname" validate:"required" errors:"required:global.lastname.required"`
+    Addresses []Address `json:"addresses" validate:"dive"` // the dive keyword is important
 }
 
 addressOk := Address{Street: "Daham 66"}
@@ -84,13 +84,13 @@ data := Customer{Adresses: []Address{addressOk, addressWrong}}
 fieldErrors, err := NewValidator().Struct(data, nil)
 ```
 
-fieldErrors contains `addresses.1.street -> global.street.required`, the index of the struct which contains the invalid 
+fieldErrors contains `addresses.1.street -> global.street.required`, the struct which contains the invalid 
 value is indicated by its index.
 
 This does work with slices of scalar values too
 ```go
 type SliceOneOf struct {
-	Name []string `json:"name" validate:"dive,oneof=one two three" errors:"oneof:name must be one two or three"`
+    Name []string `json:"name" validate:"dive,oneof=one two three" errors:"oneof:name must be one two or three"`
 }
 
 data := SliceOneOf{Name: []string{"four"}}
@@ -99,7 +99,7 @@ fieldErrors, err := NewValidator().Struct(data, nil)
 
 fieldErrors contains: `name.0 -> name must be one two or three`
 
-## sanitize
+## Sanitize
 
 If you want to do some kind of sanitization, like triming, you can use the sanitizer which is a simple wrapper around 
 go-playground/mold.
@@ -125,15 +125,15 @@ The loginData struct is modified in place.
 
 For available modifiers see: [go-playground/mold](https://github.com/go-playground/mold).
 
-## examples
+## Examples
 
 ### Password quality check
 
 ```go
 type RequestData struct {
-	Username   string          `json:"username" mod:"trim,lcase" validate:"required,email" errors:"required:validation.global.email_required,email:validation.global.email_invalid"`
-	Password1  string          `json:"password1" validate:"required,min=8,containsLowercase,containsUppercase,containsDigit,containsSpecialChar" errors:"required:validation.global.password_required,min:validation.global.password.minlength,containsLowercase:validation.global.password.lowercase,containsUppercase:validation.global.password.uppercase,containsDigit:validation.global.password.digit,containsSpecialChar:validation.global.password.special_character"`
-	Password2  string          `json:"password2" validate:"required,eqfield=Password1" errors:"required:user.validation.passwords_must_match"`
+    Username   string          `json:"username" mod:"trim,lcase" validate:"required,email" errors:"required:validation.global.email_required,email:validation.global.email_invalid"`
+    Password1  string          `json:"password1" validate:"required,min=8,containsLowercase,containsUppercase,containsDigit,containsSpecialChar" errors:"required:validation.global.password_required,min:validation.global.password.minlength,containsLowercase:validation.global.password.lowercase,containsUppercase:validation.global.password.uppercase,containsDigit:validation.global.password.digit,containsSpecialChar:validation.global.password.special_character"`
+    Password2  string          `json:"password2" validate:"required,eqfield=Password1" errors:"required:user.validation.password_required"`
 }
 ```
 
@@ -141,6 +141,6 @@ type RequestData struct {
 
 ```go
 type RequestData struct {
-	Id     types.UUID    `json:"id" validate:"omitempty,uuid4" errors:"uuid4:validation.global.id_invalid"`
+    Id types.UUID    `json:"id" validate:"omitempty,uuid4" errors:"uuid4:validation.global.id_invalid"`
 }
 ```
