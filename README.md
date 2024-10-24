@@ -1,4 +1,4 @@
-[![](https://github.com/mbretter/go-validation/actions/workflows/go.yml/badge.svg)](https://github.com/mbretter/go-validation/actions/workflows/test.yml)
+[![](https://github.com/mbretter/go-validation/actions/workflows/test.yml/badge.svg)](https://github.com/mbretter/go-validation/actions/workflows/test.yml)
 [![](https://goreportcard.com/badge/mbretter/go-validation)](https://goreportcard.com/report/mbretter/go-validation "Go Report Card")
 [![codecov](https://codecov.io/gh/mbretter/go-validation/graph/badge.svg?token=YMBMKY7W9X)](https://codecov.io/gh/mbretter/go-validation)
 
