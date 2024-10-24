@@ -18,7 +18,7 @@ type Validator struct {
 	backend *validator.Validate
 }
 
-var regexIndex = regexp.MustCompile(`(\[\d])$`)
+var regexIndex = regexp.MustCompile(`(\[(\d+)])$`)
 
 func NewValidator() Validator {
 	be := validator.New(validator.WithRequiredStructEnabled())
@@ -103,7 +103,7 @@ func (v Validator) Struct(s any, tl Translate) (FieldErrors, error) {
 			for i := range p {
 				f := getStructField(t, p[:i+1])
 				if f != nil && f.Anonymous == false {
-					n := regexIndex.ReplaceAllString(ns[i], "") // strip array index
+					n := regexIndex.ReplaceAllString(ns[i], ".$2") // replace array index [x] with dot notation
 					filtered = append(filtered, n)
 				}
 			}
@@ -120,7 +120,7 @@ func getStructField(s reflect.Type, path []string) *reflect.StructField {
 
 	t := s
 	for _, p := range path {
-		if t.Kind() == reflect.Ptr {
+		if t.Kind() == reflect.Ptr || t.Kind() == reflect.Slice || t.Kind() == reflect.Array {
 			t = t.Elem()
 		}
 

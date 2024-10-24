@@ -45,7 +45,15 @@ type MalformedErrors struct {
 }
 
 type SliceOneOf struct {
-	Name []string `json:"name" validate:"dive,oneof=one two three"`
+	Name []string `json:"name" validate:"dive,oneof=one two three" errors:"oneof:name must be one two or three"`
+}
+
+type SliceOfStructs struct {
+	Adresses []Address `json:"addresses" validate:"dive"`
+}
+
+type ArrayOfStructs struct {
+	Adresses [2]Address `json:"addresses" validate:"dive"`
 }
 
 type CustomValidators struct {
@@ -74,14 +82,14 @@ func TestStruct_Fail(t *testing.T) {
 	loginData := LoginData{
 		Username: "",
 		Address: Address{
-			Street: "Daham 66",
+			Street: "",
 		},
 	}
 
 	fieldErrors, err := NewValidator().Struct(loginData, nil)
 
 	assert.Nil(t, err)
-	assert.Equal(t, FieldErrors{"username": "global.username.required"}, fieldErrors)
+	assert.Equal(t, FieldErrors{"address.street": "global.street.required", "username": "global.username.required"}, fieldErrors)
 }
 
 func TestStruct_PtrOk(t *testing.T) {
@@ -196,7 +204,29 @@ func TestStruct_SliceOneOfFail(t *testing.T) {
 	fieldErrors, err := NewValidator().Struct(data, nil)
 
 	assert.Nil(t, err)
-	assert.Equal(t, FieldErrors{"name": "oneof"}, fieldErrors)
+	assert.Equal(t, FieldErrors{"name.0": "name must be one two or three"}, fieldErrors)
+}
+
+func TestStruct_SliceOfStructsFail(t *testing.T) {
+	addressOk := Address{Street: "Daham 66"}
+	addressWrong := Address{Street: ""}
+	data := SliceOfStructs{Adresses: []Address{addressOk, addressWrong}}
+
+	fieldErrors, err := NewValidator().Struct(data, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, FieldErrors{"addresses.1.street": "global.street.required"}, fieldErrors)
+}
+
+func TestStruct_ArrayOfStructsFail(t *testing.T) {
+	addressOk := Address{Street: "Daham 66"}
+	addressWrong := Address{Street: ""}
+	data := ArrayOfStructs{Adresses: [2]Address{addressOk, addressWrong}}
+
+	fieldErrors, err := NewValidator().Struct(data, nil)
+
+	assert.Nil(t, err)
+	assert.Equal(t, FieldErrors{"addresses.1.street": "global.street.required"}, fieldErrors)
 }
 
 func TestVar_Ok(t *testing.T) {
