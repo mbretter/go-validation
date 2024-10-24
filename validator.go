@@ -40,6 +40,10 @@ func NewValidator() Validator {
 	}
 }
 
+func (v Validator) RegisterCustomTypeFunc(fn validator.CustomTypeFunc, types ...interface{}) {
+	v.backend.RegisterCustomTypeFunc(fn, types...)
+}
+
 func (v Validator) Var(val any, tag string) ([]string, error) {
 	err := v.backend.Var(val, tag)
 
