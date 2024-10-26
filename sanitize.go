@@ -11,6 +11,7 @@ type Sanitizer struct {
 	backend *mold.Transformer
 }
 
+// NewSanitizer creates a new instance of Sanitizer with a background context and a default transformer backend.
 func NewSanitizer() Sanitizer {
 	be := modifiers.New()
 	return Sanitizer{
@@ -19,6 +20,7 @@ func NewSanitizer() Sanitizer {
 	}
 }
 
+// Struct sanitizes the given struct based on the rules defined in its fields' tags.
 func (s Sanitizer) Struct(val any) error {
 	err := s.backend.Struct(s.ctx, val)
 	if err != nil {

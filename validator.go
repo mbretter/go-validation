@@ -1,3 +1,9 @@
+// Package validation is basically a wrapper around https://github.com/go-playground/validator and https://github.com/go-playground/mold.
+//
+// Besides the functionality of the go-playground packages it supports a more flexible error translation by using struct tags for error messages.
+//
+// The error message is set into the `errors` tag of the struct field, the key is the validator as provided in the `validate`
+// struct tag. Multiple validators/errors are supported.
 package validation
 
 import (
@@ -20,6 +26,7 @@ type Validator struct {
 
 var regexIndex = regexp.MustCompile(`(\[(\d+)])$`)
 
+// NewValidator initializes and returns a new Validator instance with default configurations and custom validations.
 func NewValidator() Validator {
 	be := validator.New(validator.WithRequiredStructEnabled())
 	_ = be.RegisterValidation("dateString", validateDateString)
@@ -40,10 +47,12 @@ func NewValidator() Validator {
 	}
 }
 
+// RegisterCustomTypeFunc registers a custom validation function for specific types with the validator backend.
 func (v Validator) RegisterCustomTypeFunc(fn validator.CustomTypeFunc, types ...interface{}) {
 	v.backend.RegisterCustomTypeFunc(fn, types...)
 }
 
+// Var validates a single variable using the specified validation tag and returns a list of errors or nil if valid.
 func (v Validator) Var(val any, tag string) ([]string, error) {
 	err := v.backend.Var(val, tag)
 
@@ -65,6 +74,7 @@ func (v Validator) Var(val any, tag string) ([]string, error) {
 	return errs, nil
 }
 
+// Struct validates a given struct instance according to the validator rules set up and returns any field validation errors.
 func (v Validator) Struct(s any, tl Translate) (FieldErrors, error) {
 	fe := make(FieldErrors)
 
@@ -119,6 +129,7 @@ func (v Validator) Struct(s any, tl Translate) (FieldErrors, error) {
 	return fe, nil
 }
 
+// getStructField retrieves the specified field by following a path of names within a struct type using reflection.
 func getStructField(s reflect.Type, path []string) *reflect.StructField {
 	var field reflect.StructField
 
@@ -139,6 +150,7 @@ func getStructField(s reflect.Type, path []string) *reflect.StructField {
 	return &field
 }
 
+// parseErrorsTag parses the "errors" tag of a struct field into a map of error keys and their corresponding messages.
 func parseErrorsTag(tag string) tagErrors {
 	errMap := make(tagErrors)
 
